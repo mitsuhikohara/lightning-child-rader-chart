@@ -42,6 +42,9 @@ if ( $my_lightning_additional_css ) {
 }
 
 /************************************************
+ * 独自の処理を必要に応じて書き足します
+ */
+/************************************************
  * Rader Chart
  */
 function childtheme_enqueue_scripts() {
@@ -193,3 +196,9 @@ plugins: [{
     }
 }]
 });
+});
+</script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('radar_chart', 'radar_chart_shortcode');
