@@ -69,6 +69,7 @@ function radar_chart_shortcode($atts) {
             'width' => '300',
             'height' => '300',
             'label' => 'サイト評価',
+            'max_score' => '100', // 1項目あたりの満点
         ),
         $atts,
         'radar_chart'
@@ -76,6 +77,7 @@ function radar_chart_shortcode($atts) {
 
     $labels = explode(',', $atts['labels']);
     $data = explode(',', $atts['data']);
+    $max_score = max(1, floatval($atts['max_score']));
     $chart_id = 'radar_' . uniqid(); // ← 自動生成ID
 
     ob_start();
@@ -92,7 +94,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const labels = <?php echo json_encode($labels); ?>;
     const dataValues = <?php echo json_encode($data); ?>;
     const totalScore = dataValues.reduce((a, b) => a + Number(b), 0);
-    const maxScore = dataValues.length * 10;
+    const itemMax = <?php echo json_encode($max_score); ?>;
+    const maxScore = dataValues.length * itemMax;
 
     // 総合得点表示
     document.getElementById('total-score-<?php echo esc_attr($chart_id); ?>')
@@ -132,7 +135,7 @@ new Chart(ctx, {
         scales: {
             r: {
                 min: 0,
-                max: 10,
+                max: itemMax,
                 ticks: {
                     display: false // ← 軸の数値を非表示
                 },
@@ -170,7 +173,7 @@ plugins: [{
             const radius = 14;
 
             // 背景色を条件分岐
-            if (value == 10) {
+            if (Number(value) >= itemMax) {
                 ctx.fillStyle = 'gold'; // 満点は金色
             } else if (value >= avg) {
                 ctx.fillStyle = 'rgba(0,200,0,0.8)'; // 平均以上は緑
